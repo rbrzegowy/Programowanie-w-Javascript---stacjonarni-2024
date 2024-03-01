@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM, zdarzenia w JS</title>
+    <script type="text/javascript" src="./65-dom-zdarzenia.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+        integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #ccc;
+        }
+
+        main {
+            margin: 20px;
+        }
+
+        #kulka {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .red {
+            background: yellow
+        }
+
+        .pedzel {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: deepskyblue;
+        }
+
+        #plotno {
+            width: 100%;
+            height: 400px;
+            background: #999;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <button class="btn btn-danger" id="btn">Kliknij mnie</button>
+        <button id="kulka" type="button" class="btn btn-info"></button>
+        <div id="plotno">
+
+        </div>
+    </main>
+</body>
+
+</html>

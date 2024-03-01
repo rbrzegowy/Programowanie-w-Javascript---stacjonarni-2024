@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DOM, scroll, położenie i rozmiary bloków</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <div class="buttons">
+      <button id="ok">Ok</button>
+      <button id="cancel">Anuluj</button>
+    </div>
+    <main></main>
+    <script>
+      // pobieranie elemementu ze struktury DOM
+      const cancelButton = window.document.getElementById('cancel')
+      const mainContainer = document.querySelector('main') // selektory jak w css: .ok, button itd
+      const okButton = document.querySelector('#ok') // selektory jak w css: .ok, button itd
+
+      // pobieranie listy elementów
+      const imgList = document.querySelectorAll('.thumb')
+      const priceList = document.getElementsByClassName('price') //.getElementsByName, .getElementsByTagName(NS)
+
+      // nowy element
+      const newOk = document.createElement('button')
+
+      // kopia
+      const okClone = okButton.cloneNode(true)
+
+      // zmiana struktury DOM
+      // dzieciaki
+      mainContainer.appendChild(okButton)
+      mainContainer.removeChild(cancelButton) // .replaceChild()
+
+      // wstawianie przed/za elementem - jeśli element istnieje w DOM -> zostanie przeniesiony
+      mainContainer.insertBefore(okClone, imgList[0])
+
+      // zamiana zawartości elementu
+      mainContainer.innerHTML = '<h1>Rzeźbie html-a z js-a</h1>'
+      mainContainer.textContent = 'nudno tutaj...' // jeśli zależy Ci tylko na pobraniu widocznej zawartości: .innerText
+
+      // style css
+      mainContainer.style.background = '#000'
+      mainContainer.style.marginTop = '10px'
+
+      // pobieranie obliczonych css-ow
+      // window.getComputedStyle(elem) - zwraca live obiekt cssowy (zmiana css, powoduje zmianę obiektu)
+
+      // klasy css
+      mainContainer.className = 'red big header' // do czyszczenia/nadpisywania
+      mainContainer.classList.add('red')
+      mainContainer.classList.remove('header')
+      mainContainer.classList.toggle('header')
+      console.log(mainContainer.classList.contains('header'))
+
+      // rozmiary elementu
+      // element.outerWidth /.outerHeight - z paskami, toolbarem etc
+      // .innerWidth/.innerHeight - sam viewport
+
+      // scrollWidth/scrollHeight - całość elementu (również niewidoczna część)
+      // offsetWidth/offsetHeight - widoczna część elementu (z paddingiem i borderem)
+      // clientWidth/clientHeight - widoczna eczęść elementu (bez bordera)
+    </script>
+  </body>
+</html>
