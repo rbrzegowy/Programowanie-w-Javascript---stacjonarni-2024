@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>JS - Deklarowanie funkcji</title>
+  </head>
+
+  <body>
+    <button id="ok">Press me if you want</button>
+    <script>
+      'use strict'
+
+      // Wprowadzenie:
+      // Funkcje są OBIEKTAMI. yep.
+      // Mogą być używane jak obiekty - np. przechowywane w zmiennych czy tablicach, mogą być argumentami innych funkcji,
+      // mogą być zwracane przez inne funkcje (uwaga na czas życia i zasięg zwróconej funkcji/obiektu - domknięcia)
+      // Funkcja konstruktora posiada właściwość "this" (jeśli wywołamy funkcję jako konstruktor - z operatorem "new")
+      // ..ale też this można używać w każdej funkcji:)
+
+      // 1. klasyka - tzw. function statement
+      // funkcji można używać w kodzie przed jej deklaracją.
+      const c = add(3, 5, 12, 1232343, 123123)
+      function add(a, b, ...reszta) {}
+
+      const ages = [10, 20, 30]
+      const bigElements = ages.every(function (age) {
+        return age > 15
+      })
+      // bardziej życiowo: const bigElements = ages.every( age => age>15 )
+
+      // Argumenty funkcji
+      // easy one
+      function sum(a, b) {
+        return a + b
+      }
+      // default values
+      function addTax(amount, tax = 0.23) {
+        return amount * (1 + tax)
+      }
+      // 'rest' operator
+      function sumEmAll(a, b, ...rest) {
+        let ret = a + b
+        if (Array.isArray(rest)) {
+          ret += rest.reduce((acc, val) => (acc += val), 0)
+        }
+        return ret
+      }
+
+      // arguments object - old way
+      function sum3() {
+        console.log('[sum3] arguments:', arguments)
+      }
+      sum3(1)
+      sum3(1, 2, 3)
+      sum3(1, 2, 3, 4, 5, 6)
+
+      // 2. poprzez przypisanie do zmiennej - tzw. function expression z użyciem literału function()
+      // uwaga na hoisting
+      const substr = function (a, b) {
+        return a - b
+      }
+
+      // 2. na wypasie - nazwana funkcja anonimowa
+      // wygodne do debugowania funkcji i rekurencji.
+      // Nazwa funkcji widoczna jest jedynie w tejże funkcji!
+      const mult = function multiply(a, b) {
+        return a * b
+      }
+      mult()
+      // przykład z mdn
+      function foo(i) {
+        if (i < 0) {
+          return
+        }
+        console.log(`begin: ${i}`)
+        foo(i - 1)
+        console.log(`end: ${i}`)
+      }
+      foo(3)
+
+      // 3. "arrow functions" (other name - lambda, fat arrow)
+      const sum2 = (a, b) => {
+        return a + b
+      }
+      const div = function (a, b) {
+        return a / b
+      }
+      /* odpowiednik powyższego
+      let div = (a, b) => a/b
+    */
+      // uwaga! strzałki nie tworzą nowego kontekstu dla 'this'! (w odróżnieniu od function() {})
+      let btn = document.querySelector('#ok')
+      btn.addEventListener('click', () => console.log(this)) // window
+      btn.addEventListener('click', function () {
+        console.log(this)
+      }) // btn - HTMLElement
+
+      // narzucenie this-a: .apply(), .call(), .bind()
+      // function whatTHFisThis() {
+      //   console.log(this)
+      // }
+      // whatTHFisThis.apply(btn)
+
+      // eo konw 08.03.2024
+    </script>
+  </body>
+</html>

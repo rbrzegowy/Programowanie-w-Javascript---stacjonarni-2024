@@ -3,6 +3,9 @@
 document.addEventListener("DOMContentLoaded", start)
 // koniec nasłuchiwania: .removeEventListener("DOMContentLoaded", start)
 
+// blokowanie domyślnej obsługi zdarzenia: ev.preventDefault()
+// blokowanie propagacji zdarzenia do rodziców: ev.stopPropagation();
+
 //event może przekazać do callback-a obiekt Event
 
 // wcześniej:
@@ -12,7 +15,10 @@ document.addEventListener("DOMContentLoaded", start)
 
 let kulka, przycisk, mouseX, mouseY
 const select = selector => document.querySelector(selector)
+
+
 function start() {
+    select('main').addEventListener('touchmove', () => console.count('[main] touchmove event'))
     select('#plotno').addEventListener("touchmove", bTM)
 
     select("#btn")
@@ -27,12 +33,13 @@ function start() {
     kulka.addEventListener('touchend', onKulkaTouchEnd)
 }
 function onKulkaTouchStart(ev) {
+    // blokowanie domyślnej obsługi zdarzenia
+    ev.preventDefault()
     console.log("Touch start")
     console.log(ev)
     this.classList.add('red')
     mouseX = ev.touches[0].screenX
     mouseY = ev.touches[0].screenY
-    console.log()
 }
 function onKulkaTouchEnd() {
     console.log("Touch end")
@@ -40,6 +47,8 @@ function onKulkaTouchEnd() {
 }
 
 function onKulkaTouchMove(ev) {
+    // nie przekazujemy zdarzenia do main
+    ev.stopPropagation()
     mouseX = ev.touches["0"].pageX - this.offsetWidth / 2
     mouseY = ev.touches["0"].pageY - this.offsetHeight / 2
     this.style.top = mouseY + 'px'
