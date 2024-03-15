@@ -1,0 +1,259 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>JS - Obiekty</title>
+  </head>
+
+  <body>
+    <script>
+      'use strict'
+
+      /* Wprowadzenie:
+
+		 co w javascript nie jest obiektem: liczby, teksty, boole, null i undefined (prymitywy)
+		 ..prawie - liczby, teksty i boole mają metody (ale nie można ich zmieniać - zobacz )
+		obiekty są KOLEKCJAMI właściwości (trochę jak tablice asocjacyjne)
+		*/
+
+      // 1. Literał + zagnieżdżanie
+      let pustyObiekt = {}
+
+      const student = {
+        imie: 'janek',
+        nazwisko: 'nowak',
+        wiek: 20,
+        'wybrane-przedmioty': 'js',
+        koledzy: {
+          lista: ['krzychu', 'zdzichu', 'krycha'],
+        },
+        czySpozywal: function () {
+          return hour > 12
+        },
+        oceny: {
+          js: [5],
+        },
+      }
+      // const obiekt
+      student.wiek = 100 // jest ok:)
+      // student = {} // nie jest ok
+
+      // 2. Fabryka
+      function zbudujStudenta(
+        imie,
+        nazwisko,
+        wiek,
+        wybranePrzedmioty,
+        koledzy,
+        oceny
+      ) {
+        return {
+          imie: imie,
+          nazwisko: nazwisko,
+          wiek: wiek,
+          'wybrane-przedmioty': wybranePrzedmioty,
+          koledzy: koledzy,
+          czySpozywal: function () {
+            return hour > 12 ? true : false
+          },
+          // wartość ze zmiennej o tej samej nazwie co klucz
+          oceny,
+        }
+      }
+      let student2 = zbudujStudenta(
+        'janek',
+        'nowak',
+        20,
+        ['js', 'c#'],
+        { lista: [] },
+        { js: [4], 'c#': [3], filozofia: [5] }
+      )
+      let student3 = zbudujStudenta(
+        'kasia',
+        'kowal',
+        19,
+        ['js', 'c#'],
+        { lista: [] },
+        { js: [5], 'c#': [5], filozofia: [5] }
+      )
+
+      let fabrykaLodow = function (rodzaj) {
+        return {
+          nazwa: 'lód', //fabryka wie co tworzy, nie przekazujemy w paramsach
+          rodzaj,
+          czymJestem: function () {
+            return `jestem ${this.nazwa} ${this.rodzaj}`
+          },
+        }
+      }
+
+      let malinowy = fabrykaLodow('malinka')
+      console.log('[fabryka]', typeof malinowy, malinowy.czymJestem())
+
+      // eof
+
+      // 4. obiekty z funkcji z użyciem 'new' - funkcja konstruktora
+      function Samochod(marka, model, blachy) {
+        this.marka = marka || 'none'
+        this.model = model || 'null'
+        this.blachy = blachy || 'zero'
+        this.opiszMnie = function () {
+          console.log(
+            `[Samochod] Jestem ${this.marka} ${this.model}, numer rejestracyjny: ${this.blachy}`
+          )
+        }
+      }
+      let fiacik = new Samochod('fiat', '500', 'KR12312')
+      let opelek = new Samochod('opelek', '500', 'KR12312')
+      fiacik.opiszMnie()
+      console.log('[object.toString]', fiacik.toString())
+
+      // 5. klasa
+      class Student {
+        #dataInstancji = new Date()
+        #punktyZycia = 0
+
+        // no setter = readonly
+        get punktyZycia() {
+          return this.#punktyZycia
+        }
+        constructor(imie, nazwisko, wiek, wybranePrzedmioty, koledzy, oceny) {
+          this.imie = imie
+          this.nazwisko = nazwisko
+          this.wiek = wiek
+          this['wybrane-przedmioty'] = wybranePrzedmioty
+          this.koledzy = koledzy
+          this.czySpozywal = function (godzina) {
+            return hour > 12 ? true : false
+          }
+          this.oceny = oceny
+        }
+        dataPowstaniaObiektu() {
+          return this.#dataInstancji.toLocaleString()
+        }
+        nawodnij(kwota) {
+          this.#punktyZycia += +kwota
+        }
+      }
+      const st4 = new Student(
+        'kasia',
+        'kowal',
+        19,
+        ['js', 'c#'],
+        { lista: [] },
+        { js: [5], 'c#': [5], filozofia: [5] }
+      )
+
+      // pobieranie właściwości obiektu
+
+      // const klucz = 'wybrane-przedmioty'
+      // console.log(student.imie + ' lubi ' + student[klucz])
+      // lub:
+      //   console.log(`${student.imie} lubi ${student['wybrane-przedmioty']}`)
+
+      // korzystanie z wlasciwosci obiektu jak z tablicy asocjacyjnej
+      // student['imie']
+
+      // przekazywanie obiektów odbywa się zawsze przez referencję
+      let s2 = student
+
+      // przypisanie wartości i rozszerzanie obiektów
+      s2.jadl = false
+      s2.imie = 'zofia'
+      console.log('[ref]', student.imie, s2.jadl) // sprawdzenie referencji z poprzedniego punktu
+
+      // usuwanie właściwości obiektu
+      delete s2.jadl
+      console.log(student.jadl)
+
+      // 7. dziedziczenie
+      // klasy nie podlegają hoistingowi z powodu dziedziczenia (dziedziczenie jest 'liczone' w momencie deklaracji klasy)
+      // rozwinięcie punktu: https://developer.mozilla.org/pl/docs/Web/JavaScript/Reference/Classes
+      // const rybnik = new Miasto()
+      class Miasto {
+        constructor(nazwa, szer, wys) {
+          this.nazwa = nazwa
+          this.szerGeog = szer
+          this.dlGeog = wys
+        }
+
+        pobierzIloscMieszkancow() {
+          return this.iloscMieszkancow
+        }
+
+        toString() {
+          return `${this.nazwa}, położenie: ${this.szerGeog}, ${this.dlGeog}`
+        }
+      }
+      // lub: let Miasto = class {}
+
+      let krakow = new Miasto('Kraków', 50.3, 16.5)
+      console.log(krakow.nazwa)
+
+      // dziedziczenie
+
+      class Metropolia extends Miasto {
+        constructor(nazwa, szer, wys, ilMieszkancow) {
+          super(nazwa, szer, wys) // wywołanie konstruktora klasy nadrzędnej
+          this.iloscMieszkancow = 100000000
+        }
+      }
+
+      // heheszki
+      console.log(typeof Metropolia)
+
+      // metody statyczne
+      class Foo {
+        static staticMethod() {
+          return `yeeep, I'm static.`
+        }
+      }
+      console.log(Foo.staticMethod()) // yep.
+
+      // 6. prototypy - obiekty
+      // prototypy to obiekty
+      // prototypem wszystkich obiektów jest obiekt Object.prototype (tu mamy .toString etc).
+      // A prototypem dla Object.prototype jest null:D
+      // prototypy obiektów są przechowywane we właściwości .__proto__ (można też pobrać z użyciem Object.getPrototypeOf())
+      // obiekty "dziedziczą" wszystkie metody i właściwości z obiektów w łańcuchy prototypów
+      // metody/właściwości prototypu moga zostać nadpisane w dziecku
+
+      // zmiana struktury prototypu skutkuje identyczną zmianą w obiektach powstałych na bazie tego prototypu
+
+      // Prototype obiektu nie zawsze jest bezpośrednio Object.prototype.
+      // ...np. tablice powstają z obiekty Array.prototype (tu mamy find, filter, map etc)
+      // .... now = new Date(). now.__proto__ to Date.prototype
+
+      // Tworzenie obiektów z konkretnego proto:
+      // (1) const child = Object.create(parent)
+      // (2) class {}
+      // (3) const x = new function(){} // funkcja konstruktora
+
+      // można redefiniować prototypy obiektów - forma dziedziczenia prototypowego
+      Samochod.prototype.silnik = 'benzyna'
+      console.log(fiacik.silnik)
+      // co tu się stało: js szukał właściwości 'silnik' w:
+      // 1. obiekcie fiacik - nie znalazł
+      // 2. prototypie obiektu fiacik (czyli w samochod) - nie znalazł
+      // 3. w prototypie samochod - znalazł.
+      // 4. gdyby nie znalazł - dotarłby do Object.prototype i potem do jego proto -> null
+      // Addon: Jeśli chcesz szukać jedynie we właściwościach nieodziedziczonych z prototypu,
+      // sprawdzaj właściwości z użyciem:
+      console.log(Object.hasOwn(fiacik, 'silnik')) // lub  starsza wersja: fiacik.hasOwnProperty('silnik')
+
+      const tab = [] /// tab.prototype -> Array.prototype
+
+      // 7. Prototypy - funkcje
+      // funkcje jako obiekty również posiadają swój prototyp: Function.prototype
+      // prototyp każdej funkcji jest dostępny w nazwaFunkcji.prototype (w odróżnieniu od mojObiekt.__proto__)
+
+      // jeżeli funkcji użyjemy jako konstruktora, jej .prototype stanie się __proto__ nowego obiektu
+      // const xiaocar = new Samochod()
+      // wtedy: xiaocar.__proto__ ==== Samochod.prototype
+
+      // this w zależności od kontekstu (window/addEventListener/klasa/funkcja)
+      // this w funkcji, funkcji konstruktora, klasie, extend klasie,
+      // w metodzie obiektu zdefiniowanej jako funkcja lub ()
+    </script>
+  </body>
+</html>

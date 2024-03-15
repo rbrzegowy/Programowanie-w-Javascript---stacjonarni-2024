@@ -7,6 +7,7 @@
 
   <body>
     <button id="ok">Press me if you want</button>
+    <input id="name"></button>
     <script>
       'use strict'
 
@@ -89,17 +90,20 @@
       let div = (a, b) => a/b
     */
       // uwaga! strzałki nie tworzą nowego kontekstu dla 'this'! (w odróżnieniu od function() {})
-      let btn = document.querySelector('#ok')
-      btn.addEventListener('click', () => console.log(this)) // window
-      btn.addEventListener('click', function () {
+      function extFn() {
         console.log(this)
-      }) // btn - HTMLElement
+      }
+      const btn = document.querySelector('#ok')
+      const input = document.querySelector('#name')
+      btn.addEventListener('click', () => console.log(this)) // window
+      btn.addEventListener('click', extFn) // btn - HTMLElement
+      input.addEventListener('input', extFn) // btn - HTMLElement
 
       // narzucenie this-a: .apply(), .call(), .bind()
-      // function whatTHFisThis() {
-      //   console.log(this)
-      // }
-      // whatTHFisThis.apply(btn)
+      function whatTHFisThis() {
+        console.log(this)
+      }
+      whatTHFisThis.apply(btn)
 
       // eo konw 08.03.2024
     </script>

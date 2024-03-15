@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>JS - Deklarowanie funkcji</title>
+  </head>
+
+  <body>
+    <button id="ok">Press me if you want</button>
+    <script>
+      'use strict'
+
+      // 4. funkcje w funkcjach
+      // f. wewn. ma dostęp do zmiennych f. zewn.
+      // zmienne f. zewn. żyją tak długo, jak żyje f. wewn.
+      // do f. wewn. nie ma bezpośredniego dostępu z zewnątrz (więc nie można jej nadpisać np poprzez inny skrypt)
+
+      function mama() {
+        const dziecko = { age: 0 }
+        return { tomek: dziecko }
+      }
+      const mamaKrysia = mama()
+
+      function liczMachine(licznikStart = 5) {
+        let licznik = licznikStart
+        function wyswietl() {
+          console.log(licznik)
+          licznik++
+        }
+        return wyswietl
+      }
+
+      let licz = liczMachine()
+      let licz2 = liczMachine()
+
+      licz()
+      licz2()
+
+      //  (function () {
+      //     const dziecko = { age: 0 }
+      //     return { tomek: dziecko }
+      //   })()
+
+      // 5. prototypy - rozszerzanie funkcji
+
+      // chaining - poszukiwanie zmiennych/metod w łańcuchu prototypów
+      function User() {
+        this.isDead = false
+      }
+      function User2() {
+        this.isDead = false
+      }
+      User.prototype.isDead = true
+      User.prototype.isZombie = true
+
+      const rysio = new User()
+      const krzys = new User()
+
+      console.log(rysio.isDead) // z funkcji
+      delete rysio.isDead
+      console.log(rysio.isDead) // z prototypu
+
+      // 6. paskudna praktyka - wstrzykiwanie funkcjonalności poprzez obiekty podstawowe
+      // analogicznie: Object.prototype, Number.prototype itd
+      Function.prototype.wirus = function () {
+        console.log('jestę wirusę i jestę w kaszsszdej funkcji:)')
+      }
+
+      // ups
+      add.wirus()
+      licz.wirus()
+
+      // ...cdn
+
+      // function() {} tworzy blok kodu zamknięty i niedostępny z poziomu deklaracji
+      // funkcje w funkcjach
+      function aa() {
+        const cztery = 4
+        function bb() {
+          console.log(cztery) // cztery jest widoczne z poziomu bloku kodu
+        }
+      }
+      aa()
+      // bb()	// 'bb' is not defined
+
+      // 7. Domknięcia to zasięg funkcyjny, który przeżył swoją egzekucję -)
+      // Domknięcie to zamykanie zakresu dla zmiennych, w połączeniu z IIFE (natychmiastowym wywołaniem funkcji) tworzy sympatyczną strukturę
+
+      // bez domknięcia
+      for (var i = 1; i < 5; i++) {
+        setTimeout(function () {
+          console.log('lekko naiwnie', i)
+        }, 1000)
+      }
+      // z domknięciem
+      for (var i = 1; i < 5; i++) {
+        ;(function (x) {
+          setTimeout(function () {
+            console.log('z domknięciem', x)
+          }, 2000)
+        })(i)
+      }
+      // po ludzku
+      for (let i = 1; i < 5; i++) {
+        setTimeout(function () {
+          console.log(i)
+        }, 3000)
+      }
+    </script>
+  </body>
+</html>
