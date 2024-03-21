@@ -1,5 +1,10 @@
 // const sound = document.querySelectorAll('sound')
+const times = []
 
+times.push({
+    key: 'a',
+    time: 123
+})
 const sounds = {
     'a': document.querySelector('#s1'),
     's': document.querySelector('#s2'),
