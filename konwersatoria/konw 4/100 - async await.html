@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Asynchroniczność - async & await</title>
+  </head>
+
+  <body>
+    <video id="vid"></video>
+    <script type="text/javascript">
+      // Promises use case - video:)
+      // const video = document.querySelector('#vid')
+      // navigator.mediaDevices
+      //   .getUserMedia({ video: true })
+      //   .then((mediaStream) => {
+      //     console.log(mediaStream, mediaStream.getVideoTracks())
+      //     video.srcObject = mediaStream
+      //     video.play()
+      //   })
+      // console.log('After getusermedia')
+
+      // rozgrzewka - kolejność console.log()
+      console.warn('Kolejność wykonania Promise')
+      const samochodziki = new Promise((resolve, reject) => {
+        resolve('idziemy na samochodziki')
+        reject('siedzimy w domu')
+      })
+      const miejscowosc = fetch('100 - miejscowosc.txt').then(d => d.text())
+      // 1. który log pojawi się jako pierwszy?
+      // 2. czy promise się wykonały zanim silnik js 'wykonał' poniższe linijki?
+      // 3. czy mamy dostęp do danych z innego promise?
+      let miasto
+      miejscowosc.then(data => {
+        console.log('miejscowosc:', data)
+        miasto = data
+      })
+      samochodziki.then(data => {
+        console.log(`samochodziki w miejscowości ${miasto}: ${data}`)
+      })
+      console.log('pobrana nazwa miejscowości: ', miasto)
+      console.log('log w kodzie po miejscowosc/samochodziki')
+
+      // problemy/możliwości Promise.then():
+      // 1. w dalszym ciągu zagnieżdżamy kod (wewnątrz .then) - ale już tylko jednopoziomowo
+      // 2. łańcuch then - problem z przekazywaniem danych 'niżej' - np. z 1go do 4go then (zmienne globalne)
+      // 3. wpspółbieżność/sekwencja wykonania promise
+
+      // --------------------
+      // 1. w dalszym ciągu zagnieżdżamy kod (wewnątrz .then) - ale już tylko jednopoziomowo
+      // --------------------
+      // proces do wykonania:
+      // 1. pobierz dane miejscowości
+      // 2. pobierz wiadomości
+      // 3. pobierz pogodę
+      // 4. wyswietl pobrane dane
+
+      // wersja killing me softly
+      // console.warn('Promise w promise - brr')
+      // miejscowosc.then(miejscowoscData => {
+      //   const wiadomosci = fetch('zrodlowiadomosczfejsa')
+      //   wiadomosci.then(listaWiadomosci => {
+      //     pogoda = fetch('pogodadlamiejscowosci')
+      //     pogoda.then(pogodaData => {
+      //       console.log(miejscowoscData, listaWiadomosci, pogodaData)
+      //     })
+      //   })
+      // })
+
+      // ------------------------
+      // 2. łańcuch then - problem z przekazywaniem danych 'niżej' - np. z 1go do 4go then (zmienne globalne lub dopisywanie danych do zwrotek z kolejnych promise)
+      // ------------------------
+      // wersja standard
+      // miejscowosc
+      //   .then((miejsce) => {
+      //     return fetch("zrodlowiadomosczfejsa");
+      //   })
+      //   .then((listawiadomosci) => {
+      //     return fetch("pogodadlamiejscowosci");
+      //   })
+      //   .then((pogoda) => {
+      //      // prawie - nie mamy tutaj zmiennych wynik i listawiadomosci!
+      //     console.log(miejsce, listawiadomosci, pogoda)
+      //   });
+
+      // ----------
+      // await
+      // -----------
+      async function asyncFn() {
+        const miejscowoscData = await miejscowosc
+        const wiadomosciData = await fetch('zrodlowiadomosczfejsa')
+        const pogodaData = await fetch('pogodadlamiejscowosci')
+        console.log(miejscowoscData, wiadomosciData, pogodaData)
+      }
+      console.log(1)
+      asyncFn()
+      console.log(2)(
+        // -----------------------------
+        // 3. współbieżność/sekwencja wykonania promise
+        // -----------------------------
+
+        // zapytania w network wykonują się jeden po drugim czy równolegle? Jak zrobić odwrotnie?
+        //   miejscowosc
+        //     .then((wynik) => {
+        //       return fetch("zrodlowiadomosczfejsa");
+        //     })
+        //     .then((listawiadomosci) => {
+        //       return fetch("pogodadlamiejscowosci");
+        //     })
+        //     .then((pogoda) => {
+        //        // prawie - nie mamy tutaj zmiennych wynik i listawiadomosci!
+        //       wyswietlWszystko(wynik, listawiadomosci, pogoda);
+        //     });
+
+        // jeden po drugim
+        async () => {
+          const prom1 = await fetch('1.txt').then(d => d.text())
+          const prom2 = await fetch('1.txt').then(d => d.text())
+          const prom3 = await fetch('1.txt').then(d => d.text())
+        }
+      )()
+      // równolegle
+      const prom1 = fetch('2.txt').then(d => d.text())
+      const prom2 = fetch('2.txt').then(d => d.text())
+      const prom3 = fetch('2.txt').then(d => d.text())
+      ;(async () => {
+        const ret1 = await prom1
+        const ret2 = await prom2
+        const ret3 = await prom3
+      })()
+      //  Najbardziej czytelnie - const [data1, data2] = await Promise.all(prom1, prom2)
+
+      // 4. jaka będzie kolejność?
+      // console.log('1')
+      // const f = async() => {
+      //     console.log('2')
+      //     const a = await Promise.resolve("that's all folks!");
+      //     console.log('3')
+      // }
+      // f(); // nie ma await!
+      // console.log('4');
+
+      // Przykłady
+      // swapi API
+      const swapiURL = 'https://swapi.dev/api'
+      const swapiPeople = 'people'
+      const swapiPlanets = 'planets'
+      const swapiStarships = 'starships'
+
+      // task one - get /people/1 and consolelogit
+
+      // task two - get starship/9 in three lines of code:)
+
+      // taks three - (a)wait for async:)
+
+      // task one
+      // fetch(`${swapiURL}/${swapiPeople}/1`)
+      //     .then(response => {
+      //         return response.json()
+      //     })
+      //     .then(ret => console.log(ret))
+      //     .catch(err => log('UPS, Fetch failed!'))
+
+      // task two
+      // fetch(`${swapiURL}/${swapiStarships}/9`)
+      //     .then(d => d.json())
+      //     .then(d => console.log("Starship 9:", d));
+
+      // task three
+      //   (async () => {
+      //     const deathStar = await fetch(`${swapiURL}/${swapiStarships}/9`).then((d) => d.json());
+      //     console.log("Starship 9:", deathStar);
+      //   })();
+
+      //   async function swapiGetPlanet(param) {
+      //     console.log("1. swapi start");
+      //     let resp = await fetch(`${swapiURL}/${param}`);
+      //     // waiting
+      //     console.log("2.", resp);
+      //     let val = resp.json();
+      //     console.log("3. swapi end", val);
+      //     return val;
+      //   }
+
+      //   let tattoine = swapiGetPlanet(swapiPlanets + "/1/");
+      //   console.log(
+      //     "4 promise wygenerowany przez async function (przez return)",
+      //     tattoine
+      //   );
+      //   console.log("5. After tattoine");
+      //   tattoine.then((ret) => console.log("6. after async then", ret));
+
+      // Another API
+      // breweryDB.com API
+      // const breweryDBUrl      = 'http://api.brewerydb.com/v2'
+      // const breweryDBKey      = '48ec344d4e67597bd4dbce206aa291c7'
+      // const breweryDBBeers    = '/beers'
+      // const breweryArgs       = '&name=Kwak'
+
+      // geoNames.org API: http://www.geonames.org/search.html?q=krakow&country=
+
+      // async function randomPromise() {
+      //     console.log("I'm the random promise")
+      //     return new Promise((resolve, reject) => {
+      //         const maxAwaitTime  = 4000
+
+      //         let randomResolveTime = Math.random() * maxAwaitTime
+      //         let randomRejectTime  = Math.random() * maxAwaitTime
+
+      //         setTimeout(()=>{return resolve(`Random promise RESOLVED in ${randomResolveTime}ms`)}, randomResolveTime)
+      //         setTimeout(()=>{return reject(`Random promise REJECTED in ${randomResolveTime}ms`)}, randomRejectTime)
+      //     })
+      // }
+      // console.log('before random promise')
+      // async function a() {
+      //     await randomPromise().then(console.log('aaa'))
+      // }
+      // a()
+      // console.log('after random promise')
+    </script>
+  </body>
+</html>

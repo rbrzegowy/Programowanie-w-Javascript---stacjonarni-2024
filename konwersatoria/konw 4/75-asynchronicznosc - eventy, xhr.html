@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asynchroniczność - DOM, zdarzenia w JS, xhr</title>
+  </head>
+  <body>
+    <div id="container"></div>
+
+    <!-- 1. -->
+    <!-- ładuję, nie kontroluję -->
+    <img src="images/totally wasted hours.jpeg" id="ob" />
+
+    <script type="text/javascript">
+      //   1. warm up - image load in js
+      // <img src='images/totally wasted hours.jpeg' id="ob">
+      const img = document.querySelector('#ob')
+      console.warn('Grafika ładowana html-em')
+      console.log('Szerokość: ', img.width)
+
+      // po js-owemu
+      let logo = new Image()
+      logo.src = './images/stackoverfl addons.png'
+      console.warn('Grafika ładowana js-em')
+      logo.addEventListener('load', logoLoaded)
+      function logoLoaded(e) {
+        console.log(`Really loaded, width: ${logo.width}`)
+        document.body.appendChild(logo)
+      }
+      console.log(`Image loaded, width: ${logo.width}`) //ups
+
+      // ----------------------------------
+      // niuanse:)
+      // ------------------------------------
+      // za pomocą callbackow odpowiedz:
+      // czy callback już nastąpił?
+      // jaki był wynik?
+      // a gdybym chciał poczekać na dwa callbacki?
+
+      /*
+      2. ajax request, JSON.parse, JSON.stringify
+      // https://developer.mozilla.org/pl/docs/XMLHttpRequest
+      // https://xhr.spec.whatwg.org/
+      alenacotokomu?
+       - nie trzeba przeładowywać strony żeby pobrać dane
+       - można używać zewnętrznych api
+       - szybsza komunikacja (brak początkowego ładowania całości aplikacji)
+       - komunikacja jest asynchroniczna (nie blokuje użytkownika)
+       - aplikacja nie traci stanu
+       */
+
+      // task - ładowanie zasobów jeden po drugim
+      let pliki = [
+        'https://picsum.photos/100/100',
+        'https://picsum.photos/200/200',
+        'https://picsum.photos/300/300',
+        'https://picsum.photos/400/400',
+        'https://picsum.photos/500/500',
+      ]
+
+      try {
+        const xhr = new XMLHttpRequest()
+        xhr.open('GET', pliki.pop())
+        xhr.send()
+        xhr.addEventListener('load', e => {
+          console.log(e)
+          const xhr = new XMLHttpRequest()
+          xhr.open('GET', pliki.pop())
+          xhr.send()
+          xhr.addEventListener('load', e => {
+            console.log(e)
+            const xhr = new XMLHttpRequest()
+            xhr.open('GET', pliki.pop())
+            xhr.send()
+            xhr.addEventListener('load', e => {
+              console.log(e)
+              const xhr = new XMLHttpRequest()
+              xhr.open('GET', pliki.pop())
+              xhr.send()
+              xhr.addEventListener('load', e => {
+                console.log(e)
+                // const xhr =
+              })
+            })
+          })
+        })
+      } catch (err) {}
+      // 3. Debugowanie - Developer Tools->Network->XHR
+    </script>
+  </body>
+</html>

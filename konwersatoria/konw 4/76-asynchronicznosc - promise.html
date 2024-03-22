@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asynchroniczność - Promises, fetch</title>
+  </head>
+  <body>
+    <div id="container"></div>
+
+    <script type="text/javascript">
+      // 1. obiekt Promise()
+      // let koniecPracy = new Promise()
+      // koniecPracy
+      //     .then(wykapSie)
+      //     .then(znajdzRower)
+      //     .then(znajdzKnajpe)
+      //     .then(bawSieDobrze)
+      //     .then(olejRower)
+      //     .then(wrocBezpiecznie)
+      //     .catch(panieWladzoToNieMojaReka)
+
+      // ale zanim - ajax na sterydach - fetch()
+      const opwApiKey = '50d53005c0fd5f556bb4ef15224c4209'
+      const openWeatherUrl = `http://api.openweathermap.org/data/2.5/weather?q=Cracow&APPID=${opwApiKey}`
+
+      let showProgressBar = true
+      const weather = fetch(openWeatherUrl)
+      console.warn('Weather Promise')
+      console.log(weather) // PROMISE!
+
+      console.warn('Weather data')
+      weather
+        .then(respObject => {
+          console.log('First .then', respObject)
+          return respObject.json()
+        })
+        .then(pogoda => {
+          console.log('Second .then', pogoda)
+        })
+        .catch(e => {
+          console.error('Catched exception: ', e)
+        })
+        .finally(e => {
+          console.log('fetch weather finally ended')
+          showProgressBar = false
+        })
+
+      // 2. Budowanie własnych Promise()
+
+      const p = new Promise((resolve, reject) => {
+        // Promise może zostać rozwiązana lub odrzucona - nigdy obydwa przypadki
+        // rozwiązanie Promise: resolve(retVal)
+        // odrzucenie Promise: reject(retVal)
+        setTimeout(() => {
+          console.log('Promise resolved, but .then not fired..:(')
+          resolve('Promises are cool!')
+        }, 2000)
+        setTimeout(() => {
+          console.log('Promise rejected')
+          // we reject and return Error object - exception
+          reject('Promises can be rejected')
+        }, 1000)
+      })
+      // check
+      p.then(data => console.log(data)).catch(e => console.log(e))
+
+      // inny przykład
+      // let licznik = 0
+      // let pr = new Promise((resolve, reject)=>
+      // {
+      //     btn.addEventListener('click', ()=>{
+      //         resolve('btn kliknięty')
+      //     })
+      //     setTimeout(()=>{
+      //         reject('nie zdążył')
+      //         }
+      //         ,10000)
+      // })
+
+      // // 3. Chaining - łączenie kolejnych Promise (jak koniecPracy w pierwszym przykladzie)
+      // // przykład - dekorowanie elementu
+      // function addBold(enl) {return new Promise()}
+      // function addItalic(el) {return new Promise()}
+      // function addUnderline(el) {return new Promise()}
+      // function addBackgroud(el,color) {return new Promise()}
+
+      // // inny przykład - czasochłonne operacje - np. działanie na dużych tablicach (mapowanie, sortowanie,filtrowanie etc) bez czekania na wynik
+
+      // -----------------------
+      // 4. Wiele Promises().
+      // Promise.all() umożliwia czekanie na wiele innych Promise!
+      // także: .allSettled() - wypełnione i odrzucone promki
+      // -----------------------
+      // console.warn('Promise.all() - pogoda')
+      // przykład - jak dostaniesz info pogodowe, wypluj posta na fejsa
+      // const fakeWeather = new Promise((resolve, reject) => {
+      //   setTimeout(() => {
+      //     resolve("Sun is shiiining");
+      //   }, 3000);
+      // });
+
+      // const fakeFB = new Promise((resolve, reject) => {
+      //   let fb = {
+      //     sendPost(p) {
+      //       console.log(`Tom on fejsik says: ${p}`);
+      //     },
+      //   };
+      //   setTimeout(() => {
+      //     resolve(fb);
+      //   }, 1000);
+      // });
+
+      // Promise.all([fakeWeather, fakeFB])
+      //   .then((responses) => {
+      //     // kolejność w tablicy jest taka sama, jak kolejność Promise w .all([])
+      //     console.log("Multiple Promises resolved", responses);
+      //     const [weather, fb] = responses;
+      //     fb.sendPost(weather);
+      //   })
+      //   .catch((errs) => {});
+      // używamy metody statycznej .all obiektu Promise.
+      // .all zwraca... Promise;)
+
+      // wszystko na raz
+      // console.warn('Promise.all() - grafiki')
+      const pliki = [
+        'https://picsum.photos/100/100',
+        'https://picsum.photos/200/200',
+        'https://picsum.photos/300/300',
+        'https://picsum.photos/400/400',
+        'https://picsum.photos/500/500',
+      ]
+      const tablicaObietnic = pliki.map(src => fetch(src))
+
+      Promise.all(tablicaObietnic).then(resp => {
+        console.log("we're done", resp)
+      })
+
+      // --------------------------------------------
+      // 5. Czekamy na pierwszą z zakończonych Promise
+      // Promise.race(): resolved lub rejected
+      // Promise.any(): tylko na resolved (zrobi reject jeśli wszystkie źródłowe zrobiły reject)
+      // --------------------------------------------
+      // Promise.race([fakeWeather,fakeFB]).then(data=>console.log('Kto pierwszy ten lepszy', data))
+
+      // --------------------------------------------------------------
+      // 6. Tworzenie defaultowo rozwiązanych lub odrzuconych Promises
+      // --------------------------------------------------------------
+      const resolved = Promise.resolve("I'm optimist!")
+      const rejected = Promise.reject("I'm pesimist")
+
+      // 7. Brak w Promise: obietnica może być rozwiązana jedynie raz - więc nie sprawdza się w strumieniach danych
+      // (TIP: wzorzec Observable lub ...callbacki;)).
+    </script>
+  </body>
+</html>
